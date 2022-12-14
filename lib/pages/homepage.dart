@@ -8,6 +8,7 @@ class HomePage extends StatelessWidget{
     // TODO: implement build
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text("Catalog App"),
       ),
       drawer: MyDrawer(),

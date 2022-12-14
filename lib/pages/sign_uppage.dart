@@ -36,6 +36,7 @@ class _signUpPageState extends State<signUpPage> {
     super.dispose();
   }
   bool changeButton = false;
+
    Widget build(BuildContext context) {
     // TODO: implement build
     return Material(
@@ -200,9 +201,7 @@ class _signUpPageState extends State<signUpPage> {
                                           final email = _email.text;
                                           final password = _password.text;
                                           final UserCredential =
-                                          await FirebaseAuth
-                                              .instance //This creates an instance of the user credentials in our firebase console everytime a user enters or registers
-                                              .createUserWithEmailAndPassword(
+                                          await FirebaseAuth.instance.createUserWithEmailAndPassword( //This creates an instance of the user credentials in our firebase console everytime a user enters or register
                                               email: email,
                                               password: password
                                           );

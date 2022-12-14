@@ -145,55 +145,101 @@ class _LoginPageState extends State<LoginPage> {
                       //     style: TextButton.styleFrom(fixedSize: Size(80, 40))),
                       //     ),
                       //To give ripple effect what we do is we wrap InkWell inside the Material widget,remove the decoration of the AnimatedContainer and give the color inside the Material widget only
-                      Padding(
-                        padding: const EdgeInsets.all(30.0),
-
-                        child: Material(
-                          borderRadius: BorderRadius.circular(12),
-                          child: ButtonTheme(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                try {
-                                  final email = _email.text;
-                                  final password = _password.text;
-                                  final UserCredential = await FirebaseAuth
-                                      .instance
-                                      .signInWithEmailAndPassword( //This creates an instance of the user credentials in our firebase console everytime a user enters or registers
-                                      email: email,
-                                      password: password
-                                  );
-                                  print(UserCredential);
+                      SizedBox(
+                        height: 30,
+                      ),
+                      Material(
+                        borderRadius: BorderRadius.circular(12),
+                        child: ButtonTheme(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                final email = _email.text;
+                                final password = _password.text;
+                                final UserCredential = await FirebaseAuth
+                                    .instance
+                                    .signInWithEmailAndPassword( //This creates an instance of the user credentials in our firebase console everytime a user enters or registers
+                                    email: email,
+                                    password: password
+                                );
+                                print(UserCredential);
+                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  Navigator.pushNamed(context, MyRoutes.homeRoute);
+                                });
+                              }
+                              on FirebaseAuthException catch(e){
+                                if(e.code=='user-not-found'){
+                                  print("User not found");
                                 }
-                                on FirebaseAuthException catch(e){
-                                  if(e.code=='user-not-found'){
-                                    print("User not found");
-                                  }
-                                  else{
-                                    print("Something bad happened");
-                                    print(e.code);
-                                  }
+                                else{
+                                  print("Something bad happened");
+                                  print(e.code);
                                 }
-                                // if (_Formkey.currentState!.validate()) {
-                                //    setState(() {
-                                //            Navigator.pushNamed(context, MyRoutes.homeRoute);
-                                //    });
-                                //  }
-                                }, child: Text("Login"),
-                            ),
-                            ),
-                            ),
+                              }
+                              // if (_Formkey.currentState!.validate()) {
+                              //    setState(() {
+                              //            Navigator.pushNamed(context, MyRoutes.homeRoute);
+                              //    });
+                              //  }
+                              }, child: Text("Login"),
                           ),
-                      Text("Forgotten Password?"),
-                      InkWell(
-                        onTap: () {
-                          Navigator.pushNamed(context, MyRoutes.homeRoute);
-                        },
-                        child: Text("Click here", style: TextStyle(
-                            color: Colors.deepPurple,
-                            decoration: TextDecoration.underline,
-                            fontWeight: FontWeight.bold
-                        ),),
-                      )
+                          ),
+                          ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Text("OR",style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18
+                      ),),
+                      //
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Create new account,",style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                              fontSize: 15
+                          ),),
+                          InkWell(
+                            onTap: () {
+                                Navigator.pushNamed(context, MyRoutes.signupRoute);
+                            },
+                            child: Text("Sign up", style: TextStyle(
+                             color: Colors.deepPurple,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                              ),),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 01,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Forgotten Password? ",style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontSize: 15
+                          ),),
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, MyRoutes.homeRoute);
+                            },
+                            child: Text("Click here", style: TextStyle(
+                                color: Colors.deepPurple,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15
+                            ),),
+                          )
+                        ],
+                      ),
+
                     ],
                   ),
                 )
