@@ -47,31 +47,28 @@ class home  extends StatelessWidget {
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
                   final user = FirebaseAuth.instance.currentUser;
-                  if (user?.emailVerified ?? false){
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Navigator.pushNamed(context, MyRoutes.homepageRoute);
-                    });
-                    return Text("Done");
+                  if(user!=null) {
+                    if (user?.emailVerified ?? false) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.pushNamed(context, MyRoutes.homepageRoute);
+                      });
+                      //return HomePage();//In this the response was slow
+                    }
+                    else {
+                     // return verifyemail();
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        Navigator.pushNamed(context, MyRoutes.verifyemailRoute);
+                      });
+                    }
                   }
                   else {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      Navigator.pushNamed(context, MyRoutes.verifyemailRoute);
-                    });
-                  //   WidgetsBinding.instance.addPostFrameCallback((_){
-                  //       Navigator.of(context).push(
-                  //       MaterialPageRoute(
-                  //       builder: (context) => const verifyemail(),
-                  //   )
-                  //   );
-                  // });
+                    return LoginPage();
+                  }
+                  return const Text("Done");
+                default:
                   return CircularProgressIndicator(
                     color: Colors.deepPurple,
-                    strokeWidth: 4,
                   );
-                  }
-                  break;
-                default:
-                  return const Text("Loading....");
               }
             }
         )

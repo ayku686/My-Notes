@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:first_app/models/catalog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/pages/loginpage.dart';
@@ -18,7 +19,8 @@ class _verifyemailState extends State<verifyemail> {
         backgroundColor: Colors.deepPurple,
         title: Text("Verify your email address",style: TextStyle(
           color: Colors.white
-        ),)
+        ),
+        ), 
       ),
       body:Padding(
         padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 8),
