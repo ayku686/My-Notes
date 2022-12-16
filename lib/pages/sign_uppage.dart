@@ -1,5 +1,5 @@
 import 'dart:developer' show log;
-
+import 'package:first_app/utilities/showAlertDialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -220,7 +220,11 @@ class _signUpPageState extends State<signUpPage> {
                                           // }
                                         }
                                         on FirebaseAuthException catch(e){
+                                            shownDialog.showAlertDialog(context,e.code.toString());
                                           log(e.code);
+                                        }
+                                        catch(e){
+                                          shownDialog.showAlertDialog(context,e.toString());
                                         }
                                     }, child: Text("Register"),
                                   ),

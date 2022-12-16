@@ -75,14 +75,14 @@ Future<bool> logoutdialog(BuildContext context){
         content: Text("Are you sure you want to sign out"),
         actions: [
           TextButton(onPressed: (){
-            Navigator.of(context).pop(true);
-          },
-            child: Text("Log Out"),
-          ),
-          TextButton(onPressed: (){
             Navigator.of(context).pop(false);
           },
             child: Text("Cancel"),
+          ),
+          TextButton(onPressed: (){
+            Navigator.of(context).pop(true);
+          },
+            child: Text("Log Out"),
           ),
         ],
       );

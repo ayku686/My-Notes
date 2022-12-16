@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'dart:developer' show log;
+import 'package:first_app/utilities/showAlertDialog.dart';
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class LoginPage extends StatefulWidget{
   @override
@@ -171,11 +172,16 @@ class _LoginPageState extends State<LoginPage> {
                               on FirebaseAuthException catch(e){
                                 if(e.code=='user-not-found'){
                                   log("User not found");
+                                  shownDialog.showAlertDialog(context,"User not found");
                                 }
                                 else{
                                   log("Something bad happened");
                                   log(e.code);
+                                  shownDialog.showAlertDialog(context,e.code.toString());
                                 }
+                              }
+                              catch(e){
+                                shownDialog.showAlertDialog(context,e.toString());
                               }
                               // if (_Formkey.currentState!.validate()) {
                               //    setState(() {
