@@ -1,3 +1,5 @@
+import 'dart:developer' show log;
+
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -47,7 +49,7 @@ class _signUpPageState extends State<signUpPage> {
             future: Firebase.initializeApp(
                 options: DefaultFirebaseOptions.currentPlatform,
             ),
-            //Here we havee FutureBuilder which takes the credentials and checks or registers it with the firebase. Now there can be two cases one is that the registration is complete and second is it didn't. In second case it returns the default case
+            //Here we have FutureBuilder which takes the credentials and checks or registers it with the firebase. Now there can be two cases one is that the registration is complete and second is it didn't. In second case it returns the default case
             builder:(context,snapshot){
               switch (snapshot.connectionState) {
                 case ConnectionState.done:
@@ -205,7 +207,10 @@ class _signUpPageState extends State<signUpPage> {
                                               email: email,
                                               password: password
                                           );
-                                          print(UserCredential);
+                                          log(UserCredential.toString());
+                                          if(UserCredential!=null){
+                                            Navigator.pushNamedAndRemoveUntil(context, MyRoutes.regsuccess,(route)=>false);
+                                          }
                                           // if (_Formkey.currentState!
                                           //     .validate()) {
                                           //   setState(() {
@@ -215,7 +220,7 @@ class _signUpPageState extends State<signUpPage> {
                                           // }
                                         }
                                         on FirebaseAuthException catch(e){
-                                          print(e.code);
+                                          log(e.code);
                                         }
                                     }, child: Text("Register"),
                                   ),

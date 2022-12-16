@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'dart:developer' show log;
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class LoginPage extends StatefulWidget{
   @override
@@ -162,18 +163,18 @@ class _LoginPageState extends State<LoginPage> {
                                     email: email,
                                     password: password
                                 );
-                                print(UserCredential);
+                                log(UserCredential.toString());
                                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  Navigator.pushNamed(context, MyRoutes.homeRoute);
+                                  Navigator.pushNamedAndRemoveUntil(context, MyRoutes.homeRoute,(route)=>false);//pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
                                 });
                               }
                               on FirebaseAuthException catch(e){
                                 if(e.code=='user-not-found'){
-                                  print("User not found");
+                                  log("User not found");
                                 }
                                 else{
-                                  print("Something bad happened");
-                                  print(e.code);
+                                  log("Something bad happened");
+                                  log(e.code);
                                 }
                               }
                               // if (_Formkey.currentState!.validate()) {

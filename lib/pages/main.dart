@@ -2,12 +2,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/pages/homepage.dart';
 import 'package:first_app/pages/loginpage.dart';
+import 'package:first_app/pages/registrationsuccessful.dart';
 import 'package:first_app/pages/sign_uppage.dart';
 import 'package:first_app/pages/verifyemail.dart';
 import 'package:first_app/utilities/MyTheme.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:first_app/firebase_options.dart';
 void main() async{
@@ -22,13 +22,15 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         theme: MyTheme.lightTheme(context),
         darkTheme: MyTheme.darkTheme(context),
-        initialRoute: MyRoutes.loginRoute,
+        initialRoute: MyRoutes.homeRoute,
         routes: {
           MyRoutes.homepageRoute: (context) => HomePage(),
           MyRoutes.loginRoute: (context) => LoginPage(),
           MyRoutes.signupRoute: (context) => signUpPage(),
           MyRoutes.verifyemailRoute: (context) => verifyemail(),
           MyRoutes.homeRoute: (context) => home(),
+          // MyRoutes.regsuccess: (context) => regsuccessfull()
+          "/regsuccessfull/":(context) => const regsuccessfull()
         }
     );
   }
@@ -62,7 +64,9 @@ class home  extends StatelessWidget {
                     }
                   }
                   else {
-                    return LoginPage();
+                    WidgetsBinding.instance.addPostFrameCallback((_){
+                    Navigator.pushNamedAndRemoveUntil(context, MyRoutes.loginRoute, (route) => false);
+                  });
                   }
                   return const Text("Done");
                 default:

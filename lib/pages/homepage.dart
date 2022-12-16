@@ -1,11 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/models/catalog.dart';
+import 'package:first_app/pages/loginpage.dart';
+import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/widgets/item_widget.dart';
 import '../widgets/drawer.dart';
 import 'dart:developer' show log;// show log indicates that we only want to import log from developer's library
 enum Menu {
   logout,
-  settings;
 }
 class HomePage extends StatelessWidget{
 
@@ -19,8 +21,18 @@ class HomePage extends StatelessWidget{
         actions: [
           PopupMenuButton(
             color: Colors.white,
-            onSelected: (value) {
-              log(value.toString());//print only prints the text to the console but log prints and also stores the text in the history
+            onSelected: (value) async{
+              // log(value.toString());//print only prints the text to the console but log prints and also stores the text in the history
+              switch(value) {
+                case Menu.logout:
+                  final want_tologout=await logoutdialog(context);//The dialog is returned from logoutdialog(context)
+                  log(want_tologout.toString());
+                  if(want_tologout){
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushNamed(context, MyRoutes.loginRoute);
+                  }
+                  break;
+              }
             },
             itemBuilder: (context) {
               return const [
@@ -60,18 +72,18 @@ Future<bool> logoutdialog(BuildContext context){
     builder: (context) {
       return AlertDialog(
         title: Text("Sign out"),
+        content: Text("Are you sure you want to sign out"),
         actions: [
-          Text("Are you sure you want to sign out"),
           TextButton(onPressed: (){
-            //Navigator.of(context).pop(true);
+            Navigator.of(context).pop(true);
           },
             child: Text("Log Out"),
           ),
           TextButton(onPressed: (){
-                  //Navigator.of(context).pop(false);
-      },
+            Navigator.of(context).pop(false);
+          },
             child: Text("Cancel"),
-          )
+          ),
         ],
       );
     },).then((value) => value ?? false);
