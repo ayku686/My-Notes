@@ -1,11 +1,10 @@
 import 'dart:developer' show log;
+import 'package:first_app/services/auth/auth_exceptions.dart';
+import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/utilities/showAlertDialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:first_app/firebase_options.dart';
 
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class signUpPage extends StatefulWidget{
@@ -37,7 +36,6 @@ class _signUpPageState extends State<signUpPage> {
     _confirmpassword.dispose();
     super.dispose();
   }
-  bool changeButton = false;
 
    Widget build(BuildContext context) {
     // TODO: implement build
@@ -46,9 +44,7 @@ class _signUpPageState extends State<signUpPage> {
         color: Colors.white,
         child: SingleChildScrollView(
           child:FutureBuilder(
-            future: Firebase.initializeApp(
-                options: DefaultFirebaseOptions.currentPlatform,
-            ),
+            future: AuthService.firebase().Initialize(),
             //Here we have FutureBuilder which takes the credentials and checks or registers it with the firebase. Now there can be two cases one is that the registration is complete and second is it didn't. In second case it returns the default case
             builder:(context,snapshot){
               switch (snapshot.connectionState) {
@@ -95,7 +91,7 @@ class _signUpPageState extends State<signUpPage> {
                                 ),
                                 validator: (value) {
                                   if (value!.isEmpty) {
-                                    return "First name cannot be empty";
+                                    return "Name cannot be empty";
                                   }
                                   else
                                     return null;
@@ -115,6 +111,13 @@ class _signUpPageState extends State<signUpPage> {
                                     labelText: "Email Id",
                                     hintText: "Enter email id"
                                 ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Email cannot be empty";
+                                  }
+                                  else
+                                    return null;
+                                },
                               ),
                             ),
                             Card(
@@ -199,33 +202,40 @@ class _signUpPageState extends State<signUpPage> {
                                   height: 30,
                                   child: ElevatedButton(
                                       onPressed: () async {
+                                      if (_Formkey.currentState!.validate()) {
                                         try {
                                           final email = _email.text;
                                           final password = _password.text;
                                           final UserCredential =
-                                          await FirebaseAuth.instance.createUserWithEmailAndPassword( //This creates an instance of the user credentials in our firebase console everytime a user enters or register
-                                              email: email,
-                                              password: password
-                                          );
+                                          await AuthService.firebase().signUp(email: email, password: password);
                                           log(UserCredential.toString());
                                           if(UserCredential!=null){
                                             Navigator.pushNamedAndRemoveUntil(context, MyRoutes.regsuccess,(route)=>false);
                                           }
-                                          // if (_Formkey.currentState!
-                                          //     .validate()) {
-                                          //   setState(() {
-                                          //     Navigator.pushNamed(
-                                          //         context, MyRoutes.homeRoute);
-                                          //   });
-                                          // }
                                         }
-                                        on FirebaseAuthException catch(e){
-                                            shownDialog.showAlertDialog(context,e.code.toString());
-                                          log(e.code);
+                                        on WeakPasswordAuthException{
+                                          log("Weak password");
+                                          shownDialog.showAlertDialog(
+                                              context, "Password is weak"
+                                          );
                                         }
-                                        catch(e){
-                                          shownDialog.showAlertDialog(context,e.toString());
+                                        on InvalidEmailAuthException{
+                                          log("Invalid email");
+                                          shownDialog.showAlertDialog(
+                                              context, "Invalid email"
+                                          );
                                         }
+                                        on EmailAlreadyInUseAuthException{
+                                          log("Email already in use");
+                                          shownDialog.showAlertDialog(
+                                              context, "Email already in use. Please try with a different email"
+                                          );
+                                        }
+                                        on GenericAuthException{
+                                          shownDialog.showAlertDialog(
+                                              context, "Invalid Credentials");
+                                        }
+                                      }
                                     }, child: Text("Register"),
                                   ),
                                 ),

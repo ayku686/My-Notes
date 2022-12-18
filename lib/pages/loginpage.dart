@@ -1,9 +1,8 @@
+import 'package:first_app/services/auth/auth_exceptions.dart';
+import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:first_app/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'dart:developer' show log;
 import 'package:first_app/utilities/showAlertDialog.dart';
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
@@ -46,9 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       color: Colors.white,
       child: SingleChildScrollView(
        child:FutureBuilder(
-        future: Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-    ),
+        future: AuthService.firebase().Initialize(),
     builder:(context,snapshot) {
       switch (snapshot.connectionState) {
         case ConnectionState.done:
@@ -155,39 +152,36 @@ class _LoginPageState extends State<LoginPage> {
                         child: ButtonTheme(
                           child: ElevatedButton(
                             onPressed: () async {
-                              try {
-                                final email = _email.text;
-                                final password = _password.text;
-                                final UserCredential = await FirebaseAuth
-                                    .instance
-                                    .signInWithEmailAndPassword( //This creates an instance of the user credentials in our firebase console everytime a user enters or registers
-                                    email: email,
-                                    password: password
-                                );
-                                log(UserCredential.toString());
-                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  Navigator.pushNamedAndRemoveUntil(context, MyRoutes.homeRoute,(route)=>false);//pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
-                                });
-                              }
-                              on FirebaseAuthException catch(e){
-                                if(e.code=='user-not-found'){
+                              if (_Formkey.currentState!.validate()) {
+                                try {
+                                  final email = _email.text;
+                                  final password = _password.text;
+                                  final UserCredential = await AuthService.firebase().logIn(
+                                      email: email,
+                                      password: password);
+                                  log(UserCredential.toString());
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      Navigator.pushNamed(
+                                          context, MyRoutes
+                                          .homeRoute); //pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
+                                    });
+                                }
+                                on UserNotFoundAuthException{
                                   log("User not found");
-                                  shownDialog.showAlertDialog(context,"User not found");
+                                  shownDialog.showAlertDialog(
+                                      context, "User not found");
                                 }
-                                else{
-                                  log("Something bad happened");
-                                  log(e.code);
-                                  shownDialog.showAlertDialog(context,e.code.toString());
+                                on WrongPasswordAuthException{
+                                  log("Wrong password");
+                                  shownDialog.showAlertDialog(
+                                      context, "Password is wrong. Please try again"
+                                  );
+                                }
+                                on GenericAuthException{
+                                  shownDialog.showAlertDialog(
+                                      context, "Authentication error");
                                 }
                               }
-                              catch(e){
-                                shownDialog.showAlertDialog(context,e.toString());
-                              }
-                              // if (_Formkey.currentState!.validate()) {
-                              //    setState(() {
-                              //            Navigator.pushNamed(context, MyRoutes.homeRoute);
-                              //    });
-                              //  }
                               }, child: Text("Login"),
                           ),
                           ),
