@@ -1,4 +1,5 @@
-import 'package:first_app/pages/homepage.dart';
+import 'package:first_app/notes/new_note_view.dart';
+import 'package:first_app/notes/notesview.dart';
 import 'package:first_app/pages/loginpage.dart';
 import 'package:first_app/pages/registrationsuccessful.dart';
 import 'package:first_app/pages/sign_uppage.dart';
@@ -22,11 +23,12 @@ class MyApp extends StatelessWidget {
         darkTheme: MyTheme.darkTheme(context),
         initialRoute: MyRoutes.homeRoute,
         routes: {
-          MyRoutes.homepageRoute: (context) => HomePage(),
+          MyRoutes.NotesviewRoute: (context) => NotesView(),
           MyRoutes.loginRoute: (context) => LoginPage(),
           MyRoutes.signupRoute: (context) => signUpPage(),
           MyRoutes.verifyemailRoute: (context) => verifyemail(),
           MyRoutes.homeRoute: (context) => home(),
+          MyRoutes.newnote: (context) => newNote(),
            MyRoutes.regsuccess: (context) => regsuccessfull()
           // "/regsuccessfull/":(context) => const regsuccessfull()
         }

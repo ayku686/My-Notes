@@ -19,7 +19,7 @@ class home  extends StatelessWidget {
                   if(user!=null) {
                     if (user.isEmailVerified) {
                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pushNamed(context, MyRoutes.homepageRoute);
+                        Navigator.pushNamed(context, MyRoutes.NotesviewRoute);
                       });
                       //return HomePage();//In this the response was slow
                     }
