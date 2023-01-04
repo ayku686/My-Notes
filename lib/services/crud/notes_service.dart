@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 import 'dart:async';
+=======
+>>>>>>> origin/master
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' show join;
 import 'package:first_app/services/crud/crud_exceptions.dart';
+<<<<<<< HEAD
 // We need stream and stream controller to cache data
 //Let's say we have 1 million rows in a table NOw if we need to delete one row it is not feasible to go to the database,
 // fetch all the rows and then delete the row Now what we can do is that we can fetch the table in our cache and delete the row
@@ -46,6 +50,10 @@ class NotesService {
       //empty
     }
   }
+=======
+class NotesService {
+  Database? _db;//Here _db is our local database
+>>>>>>> origin/master
   Database _getDatabaseOrThrow(){
     final db=_db;
     if(db==null){
@@ -69,7 +77,10 @@ class NotesService {
       await db.execute(createUserTable);
       //creating notes table
       await db.execute(createNotesTable);
+<<<<<<< HEAD
       await _cacheNotes();//We call this function in our open() so that it can open the database and cache its data locally
+=======
+>>>>>>> origin/master
     }
     on MissingPlatformDirectoryException{
       throw UnableToGetDocumentsDirectoryException();
@@ -77,7 +88,10 @@ class NotesService {
   }
   //Deleting user from table
   Future<void> deleteUser({required String email}) async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     final deletedCount = await db.delete(
       userTable,
@@ -90,7 +104,10 @@ class NotesService {
   }
   //creating new user in our table
   Future<DatabaseUser> createUser({required String email}) async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     //Below we check if the email is already present in our table or not coz we have made our email unique and no two user can have the same email
     final results = await db.query(
@@ -113,7 +130,10 @@ class NotesService {
     }
   //get the user
   Future<DatabaseUser> getUser({required String email}) async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     //Below we check if the email is already present in our table or not coz we have made our email unique and no two user can have the same email
     final results = await db.query(
@@ -132,7 +152,10 @@ class NotesService {
   }
   //create a new note
   Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     //Now we make sure that the owner exists in the database with the correct id
     final dbUser=await getUser(email: owner.email);
@@ -150,13 +173,19 @@ class NotesService {
         userId: owner.id,
         text: text,
         isSyncedWithCloud: true);
+<<<<<<< HEAD
     _notes.add(note);//This caches the newly created note in our local list _notes
     _notesStreamController.add(_notes);//This adds the updated list to  _notesStreamController
+=======
+>>>>>>> origin/master
     return note;
   }
   //delete a note
   Future<void> deleteNote({required int id}) async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     final deletedCount = await db.delete(
       noteTable,
@@ -166,6 +195,7 @@ class NotesService {
     if(deletedCount!=1){
       throw CouldNotDeleteNoteException();
     }
+<<<<<<< HEAD
     else{
       _notes.removeWhere((note) => note.id == id);//It removes the note from our local cache
       _notesStreamController.add(_notes);
@@ -174,6 +204,11 @@ class NotesService {
   //get note from the database(When the user clicks on some note the id must go to the database and the note corresponding to that id must be retrieved
   Future<DatabaseNote> getNote({required int id}) async{
     await _ensureDbIsOpen();
+=======
+  }
+  //get note from the database(When the user clicks on some note the id must go to the database and the note corresponding to that id must be retrieved
+  Future<DatabaseNote> getNote({required int id}) async{
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
     //Below we check if the note is already present in our table or not coz we have made our id unique and no two notes can have the same id
     final notes = await db.query(
@@ -186,6 +221,7 @@ class NotesService {
       throw NoteDoesNotExistsException();
     }
     else{
+<<<<<<< HEAD
       final note =DatabaseNote.fromRow(notes.first);//results.first returns the first row that was fetched
       //  and since we have set limit to 1 it will return either the first row or the exception
       _notes.removeWhere((note) => note.id==id);//Here we the note we r getting might already be present in
@@ -193,13 +229,21 @@ class NotesService {
       _notes.add(note);
       _notesStreamController.add(_notes);
       return note;
+=======
+      return DatabaseNote.fromRow(notes.first);//results.first returns the first row that was fetched
+      //  and since we have set limit to 1 it will return either the first row or the exception
+>>>>>>> origin/master
     }
   }
   //update note
   Future<DatabaseNote> updateNote({required DatabaseNote note,required String text}) async {
+<<<<<<< HEAD
     await _ensureDbIsOpen();
     final db=_getDatabaseOrThrow();
     //make sure that the note exists
+=======
+    final db=_getDatabaseOrThrow();
+>>>>>>> origin/master
     await getNote(id: note.id);
     final updatesCount = await db.update(noteTable, {
       ColumnText: text,
@@ -209,31 +253,45 @@ class NotesService {
       throw CouldNotUpdateNoteException();
     }
     else{
+<<<<<<< HEAD
       final updatedNote = await getNote(id: note.id);
       _notes.removeWhere((note) => note.id == updatedNote.id);
       _notes.add(updatedNote);
       _notesStreamController.add(_notes);
       return updatedNote;
+=======
+      return await getNote(id: note.id);
+>>>>>>> origin/master
     }
   }
   //get all notes
   Future<Iterable<DatabaseNote>> getAllNote() async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db = _getDatabaseOrThrow();
     final notes = await db.query(noteTable);
     return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
   }
   //delete all notes
   Future<int> deleteAllNotes() async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
     final db=_getDatabaseOrThrow();
     _notes.clear();
     _notesStreamController.add(_notes);
+=======
+    final db=_getDatabaseOrThrow();
+>>>>>>> origin/master
     return await db.delete(noteTable);
   }//Returns the number of rows affected
   //close the database
   Future<void> close() async{
+<<<<<<< HEAD
     await _ensureDbIsOpen();
+=======
+>>>>>>> origin/master
     final db=_getDatabaseOrThrow();
       await db.close();
       _db=null;
