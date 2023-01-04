@@ -1,5 +1,5 @@
 import 'package:first_app/services/auth/auth_service.dart';
-import 'package:first_app/services/crud/notes_service.dart';
+import 'package:first_app/services/crud/note_service.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

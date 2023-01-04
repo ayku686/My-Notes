@@ -5,7 +5,7 @@ import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:first_app/widgets/item_widget.dart';
 import '../widgets/drawer.dart';
-import 'package:first_app/services/crud/notes_service.dart';
+import 'package:first_app/services/crud/note_service.dart';
 import 'dart:developer' show log;// show log indicates that we only want to import log from developer's library
 enum Menu {
   logout,
