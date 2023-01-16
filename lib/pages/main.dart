@@ -1,4 +1,5 @@
-import 'package:first_app/notes/new_note_view.dart';
+import 'package:first_app/notes/create_update_note_view.dart';
+import 'package:first_app/notes/create_update_note_view.dart';
 import 'package:first_app/notes/notesview.dart';
 import 'package:first_app/pages/loginpage.dart';
 import 'package:first_app/pages/registrationsuccessful.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
           MyRoutes.signupRoute: (context) => signUpPage(),
           MyRoutes.verifyemailRoute: (context) => verifyemail(),
           MyRoutes.homeRoute: (context) => home(),
-          MyRoutes.newnote: (context) => newNote(),
+          MyRoutes.createUpdateNote: (context) => createUpdateNote(),
            MyRoutes.regsuccess: (context) => regsuccessfull()
           // "/regsuccessfull/":(context) => const regsuccessfull()
         }

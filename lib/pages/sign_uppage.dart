@@ -1,7 +1,7 @@
 import 'dart:developer' show log;
 import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
-import 'package:first_app/utilities/showAlertDialog.dart';
+import 'package:first_app/utilities/dialog/showAlertDialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -215,24 +215,24 @@ class _signUpPageState extends State<signUpPage> {
                                         }
                                         on WeakPasswordAuthException{
                                           log("Weak password");
-                                          shownDialog.showAlertDialog(
+                                          showAlertDialog(
                                               context, "Password is weak"
                                           );
                                         }
                                         on InvalidEmailAuthException{
                                           log("Invalid email");
-                                          shownDialog.showAlertDialog(
+                                          showAlertDialog(
                                               context, "Invalid email"
                                           );
                                         }
                                         on EmailAlreadyInUseAuthException{
                                           log("Email already in use");
-                                          shownDialog.showAlertDialog(
+                                          showAlertDialog(
                                               context, "Email already in use. Please try with a different email"
                                           );
                                         }
                                         on GenericAuthException{
-                                          shownDialog.showAlertDialog(
+                                          showAlertDialog(
                                               context, "Invalid Credentials");
                                         }
                                       }

@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../services/auth/auth_service.dart';
 class MyDrawer extends StatelessWidget{
-
+  final currentUser = AuthService.firebase().currentUser!;
   String MyImage="https://www.rolls-roycemotorcars.com/content/dam/rrmc/marketUK/rollsroycemotorcars_com/black-badge-ghost-2021/page-components/BB_RR21_HERO_D.jpg/jcr:content/renditions/cq5dam.web.1242.webp";
   Widget build(BuildContext context){
     return Drawer(
@@ -17,7 +18,7 @@ class MyDrawer extends StatelessWidget{
                     fontWeight: FontWeight.bold,
                     fontSize: 18
                   ),),
-                  accountEmail: Text("ayku21cs@cmrit.ac.in"),
+                  accountEmail: Text(currentUser.email.toString()),
                   //We use NetworkImage to take images from the internet. Here MyImage is a string we created above which contains the web address of the image
                     // CircleAvatar we used to make our display our image in circular manner
                   currentAccountPicture: CircleAvatar(

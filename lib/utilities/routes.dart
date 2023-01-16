@@ -5,5 +5,5 @@ class MyRoutes {
   static String verifyemailRoute = "/verifyemail";
   static String homeRoute = "/home";
   static String regsuccess = "/regsuccessfull";
-  static String newnote = "/newNote";
+  static String createUpdateNote = "/createUpdateNote";
 }

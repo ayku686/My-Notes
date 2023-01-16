@@ -1,4 +1,6 @@
+import 'package:first_app/pages/home.dart';
 import 'package:first_app/services/auth/auth_service.dart';
+import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 class verifyemail extends StatefulWidget{
@@ -9,6 +11,12 @@ class verifyemail extends StatefulWidget{
 }
 final user=AuthService.firebase().currentUser;
 class _verifyemailState extends State<verifyemail> {
+  @override
+  // void initState() {
+  //   Navigator.pushNamedAndRemoveUntil(
+  //       context, MyRoutes.homeRoute, (route) => false);
+  //   super.initState();
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,14 +35,25 @@ class _verifyemailState extends State<verifyemail> {
             TextButton(
                 onPressed: () async {
                   AuthService.firebase().sendVerificationEmail();
+                  Future.delayed(Duration(seconds: 10));
+                  if (await EmailVerified()) {
+                    home();
+                  }
                 },
-                  child:Text("Send email verification")
-
+                child: Text("Send email verification")
               ),
         ]
         ),
       )
     );
   }
-
+}
+Future<bool> EmailVerified() async{
+  var yes=await user!.isEmailVerified;
+  if(yes){
+    return true;
+  }
+  else{
+    return false;
+  }
 }

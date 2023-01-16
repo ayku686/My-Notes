@@ -7,3 +7,4 @@ class DatabaseIsNotOpenException implements Exception{}
 class CouldNotDeleteNoteException implements Exception{}
 class NoteDoesNotExistsException implements Exception{}
 class CouldNotUpdateNoteException implements Exception{}
+class UserShouldBeSetBeforeReadingAllNotes implements Exception{}

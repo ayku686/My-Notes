@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:first_app/extensions/list/filter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,20 +14,44 @@ class NotesService {
   Database? _db;//Here _db is our local database
   List<DatabaseNote> _notes= [];//We created an empty list of notes which will have elements of type DatabaseNote
   //Creating singleton
+  DatabaseUser? _user;
   static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  NotesService._sharedInstance(){
+    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(//Here after calling the StreamController we need to specify the type of data our stream contains
+      //The Stream returned by stream is a broadcast stream. It can be listened to more than once.Stream Controller basically reflect the change we do in our local cache to our UI in
+      //response to the actions performed by the user on the UI
+      //_cacheNotes() caches our database to the local variable _notes
+      onListen: (){
+        _notesStreamController.sink.add(_notes);
+      }
+    );
+  }
   factory NotesService() => _shared;
-  final _notesStreamController = StreamController<List<DatabaseNote>>.broadcast();//Here after calling the StreamController we need to specify the type of data our stream contains
-  //The Stream returned by stream is a broadcast stream. It can be listened to more than once.Stream Controller basically reflect the change we do in our local cache to our UI in
-  //response to the actions performed by the user on the UI
-  //_cacheNotes() caches our database to the local variable _notes
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;//This is a getter which gets all the notes from streamController and store it into allNotes
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+
+  late  final StreamController<List<DatabaseNote>> _notesStreamController ;
+  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream.filter((note){
+    final currentUser=_user;
+    if(currentUser!=null){
+      return note.userId == currentUser.id;
+    }else{
+      throw UserShouldBeSetBeforeReadingAllNotes();
+    }
+  });//This is a getter which gets all the notes from streamController and store it into allNotes
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentuser = true,
+  }) async {
     try{
       final user = await getUser(email: email);
+      if(setAsCurrentuser){
+        _user = user;//THis sets the value of user to _user and the database now knows who the current user is
+      }
       return user;
     }on UserDoesNotExistsException{
-      final createdUser = createUser(email: email);
+      final createdUser =await createUser(email: email);
+      if(setAsCurrentuser){
+        _user = createdUser;//THis sets the value of user to _user and the database now knows who the current user is
+      }
       return createdUser;
     }catch(e){
       rethrow;
@@ -57,7 +82,7 @@ class NotesService {
   }
   //opening our database
   Future<void> open() async {
-    if (_db == null) {
+    if (_db != null) {
       throw DatabaseAlreadyOpenException();
     }
     try{
@@ -163,7 +188,7 @@ class NotesService {
       where: 'id = ?',
       whereArgs: [id],
     );
-    if(deletedCount!=1){
+    if(deletedCount==0){
       throw CouldNotDeleteNoteException();
     }
     else{
@@ -204,7 +229,10 @@ class NotesService {
     final updatesCount = await db.update(noteTable, {
       ColumnText: text,
       ColumnIsSyncedWithCloud: 0
-    });
+    },
+    where: 'id = ?',
+      whereArgs: [note.id]
+    );
     if(updatesCount==0){
       throw CouldNotUpdateNoteException();
     }
@@ -233,7 +261,6 @@ class NotesService {
   }//Returns the number of rows affected
   //close the database
   Future<void> close() async{
-    await _ensureDbIsOpen();
     final db=_getDatabaseOrThrow();
     await db.close();
     _db=null;
@@ -254,7 +281,7 @@ class DatabaseUser{//This is our user table which has two columns id and email
   @override
   String toString() => 'Person,ID=$id,email=$email';
   @override
-  bool operator ==(covariant DatabaseUser other) => id == other.id;
+  bool operator == (covariant DatabaseUser other) => id == other.id;
   int get hashcode => id.hashCode;
 }
 class DatabaseNote{
@@ -276,9 +303,9 @@ class DatabaseNote{
         isSyncedWithCloud= (map[ColumnIsSyncedWithCloud]  as int)==1 ? true : false ;
   @override
   String toString() =>
-      'Note,ID=$id,userId=$userId,text=$text,isSyncedWithCloud=$isSyncedWithCloud';
+      'Note, ID=$id, userId=$userId, text=$text, isSyncedWithCloud=$isSyncedWithCloud';
   @override
-  bool operator ==(covariant DatabaseNote other) => id == other.id;
+  bool operator == (covariant DatabaseNote other) => id == other.id;
   int get hashcode => id.hashCode;
 }
 const dbName='notes.db';
@@ -286,9 +313,9 @@ const noteTable='note';
 const userTable='user';
 const ColumnId='id';
 const ColumnEmail='email';
-const ColumnUserId='userId';
+const ColumnUserId='user_id';
 const ColumnText='text';
-const ColumnIsSyncedWithCloud='isSyncedWithCloud';
+const ColumnIsSyncedWithCloud='is_synced_with_cloud';
 const createUserTable = '''
           CREATE TABLE IF NOT EXISTS "user" (
             "id"	INTEGER NOT NULL,
@@ -300,8 +327,8 @@ const createNotesTable = '''
           CREATE TABLE IF NOT EXISTS "note" (
             "id"	INTEGER NOT NULL,
             "user_id"	INTEGER NOT NULL,
-            "text"	TEXT NOT NULL,
-            "is_synced_with"	INTEGER NOT NULL,
+            "text"	TEXT NOT NULL, 
+            "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
             PRIMARY KEY("id" AUTOINCREMENT),
             FOREIGN KEY("user_id") REFERENCES "user"("id")
           );

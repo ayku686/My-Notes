@@ -4,7 +4,7 @@ import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer' show log;
-import 'package:first_app/utilities/showAlertDialog.dart';
+import 'package:first_app/utilities/dialog/showAlertDialog.dart';
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class LoginPage extends StatefulWidget{
   @override
@@ -168,17 +168,17 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                                 on UserNotFoundAuthException{
                                   log("User not found");
-                                  shownDialog.showAlertDialog(
+                                  showAlertDialog(
                                       context, "User not found");
                                 }
                                 on WrongPasswordAuthException{
                                   log("Wrong password");
-                                  shownDialog.showAlertDialog(
+                                  showAlertDialog(
                                       context, "Password is wrong. Please try again"
                                   );
                                 }
                                 on GenericAuthException{
-                                  shownDialog.showAlertDialog(
+                                  showAlertDialog(
                                       context, "Authentication error");
                                 }
                               }

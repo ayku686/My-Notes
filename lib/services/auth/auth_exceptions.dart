@@ -1,5 +1,5 @@
 // This file we are creating so that our code looks clean
-import 'package:first_app/utilities/showAlertDialog.dart';
+import 'package:first_app/utilities/dialog/showAlertDialog.dart';
 
 //login page
 class UserNotFoundAuthException implements Exception{
