@@ -29,7 +29,8 @@ class FirebaseCloudStorage{
     }
   }
   Stream<Iterable<CloudNote>> allNotes({required String ownerUserId}) =>
-    notes.snapshots().map((event) => event.docs
+    notes.snapshots().map((event) => event.docs//Snapshot is the result of the Future or Stream you are listening to in your FutureBuilder
+    // . Before interacting with the data being returned and using it in your builder, you have to access it first.
         .map((doc) =>CloudNote.fromSnapshot(doc))
         .where((note) => note.ownerUserId == ownerUserId));//conditon to get note only of specified user
 
@@ -38,23 +39,23 @@ class FirebaseCloudStorage{
       return await notes.
         where(ownerUserIdFieldName , isEqualTo: ownerUserId)
         .get()
-        .then((value) => value.docs.map((doc){
-          return CloudNote(
-              documentId: doc.id,
-              ownerUserId: doc.data()[ownerUserIdFieldName] as String,
-              text: doc.data()[textFieldName] as String,
-          );
-      }));  
+        .then(
+              (value) => value.docs.map((doc) => CloudNote.fromSnapshot(doc))
+      );
     }
     catch(e){
       throw CouldNotGetAllNotesException();
     }
   }
-  void createNewNote({required String ownerUserid}) async {
-    await notes.add({
-      ownerUserIdFieldName: ownerUserid,
+  Future<CloudNote> createNewNote({required String ownerUserId}) async {
+    final document = await notes.add({
+      ownerUserIdFieldName: ownerUserId,
       textFieldName: '',
     });
+    final fetchedNote = await document.get();
+    return CloudNote(documentId: fetchedNote.id,
+        ownerUserId: ownerUserId,
+        text: '');
   }
 
 //Creating a singleton

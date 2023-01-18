@@ -3,14 +3,15 @@ import 'package:first_app/utilities/dialog/generic_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../services/cloud/cloud_note.dart';
 import '../utilities/dialog/showDeleteDialog.dart';
 //Here this list view is not itself deleting the note what it is doing is just showing the dialog
 // and passing the user's selection back(Callback) to the notesview
-typedef NoteCallback = void Function(DatabaseNote note);//This is our Callback definition
+typedef NoteCallback = void Function(CloudNote note);//This is our Callback definition
 // So we are creating this function which gets called when the user presses yes on the delete
 // alert dialog and also to access the particular note tile the user taps on
 class NotesList extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  final Iterable<CloudNote> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTap;
   const NotesList({
@@ -26,7 +27,7 @@ class NotesList extends StatelessWidget {
       child: ListView.builder(
         itemCount: notes.length,
         itemBuilder: (context,index){
-          final note=notes[index];
+          final note=notes.elementAt(index);
           return Padding(
               padding: EdgeInsets.all(12) ,
             child:ListTile(
