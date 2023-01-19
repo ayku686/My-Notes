@@ -5,6 +5,7 @@ import 'package:first_app/services/cloud/firebase_cloud_storage.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import '../services/cloud/cloud_note.dart';
+import '../utilities/MyTheme.dart';
 import '../widgets/drawer.dart';
 import 'package:first_app/utilities/dialog/logoutDialog.dart';
 import 'dart:developer' show log;// show log indicates that we only want to import log from developer's library
@@ -19,7 +20,7 @@ class NotesView extends StatefulWidget{
 
 class _NotesViewState extends State<NotesView> {
   late final FirebaseCloudStorage _notesService;
-
+  bool _boo=true;
   String get userId =>
       AuthService
           .firebase()
@@ -32,7 +33,6 @@ class _NotesViewState extends State<NotesView> {
         FirebaseCloudStorage(); //Here we made a new instance of the NotesService class
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +40,7 @@ class _NotesViewState extends State<NotesView> {
         backgroundColor: Colors.white,
         title: const Text("My Notes"),
         actions: [
+
           PopupMenuButton(
               color: Colors.white,
               onSelected: (value) async {
@@ -116,6 +117,12 @@ class _NotesViewState extends State<NotesView> {
       ),
     );
   }
+}
+Widget changeTheme(context){
+  return MaterialApp(
+    themeMode: ThemeMode.dark,
+    darkTheme: MyTheme.darkTheme(context),
+  );
 }
 // Future<bool> logoutdialog(BuildContext context){
 //   return showDialog<bool>(

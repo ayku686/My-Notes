@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:first_app/services/cloud/cloud_note.dart';
 import 'package:first_app/services/cloud/cloud_storage_exceptions.dart';
 import 'package:first_app/services/cloud/firebase_cloud_storage.dart';
+import 'package:share_plus/share_plus.dart';
+
+import '../utilities/MyTheme.dart';
+import '../utilities/dialog/cannot_share_empty_note_dialog.dart';
 
 class createUpdateNote extends StatefulWidget {
   const createUpdateNote({Key? key}) : super(key: key);
@@ -81,6 +85,7 @@ class _createUpdateNoteState extends State<createUpdateNote> {
     _textEditingController.dispose();
     super.dispose();
   }
+
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey,
@@ -88,9 +93,15 @@ class _createUpdateNoteState extends State<createUpdateNote> {
         toolbarHeight: 108,
         backgroundColor: Colors.blueGrey,
         actions: [
-          IconButton(onPressed: (){
-
-          }, icon: Icon(Icons.menu))
+          IconButton(onPressed: () async {
+            final text=_textEditingController.text;
+            if(_note==null || text.isEmpty){
+              await showCannotShareEmptyNoteDialog(context);
+            }
+            else{
+              Share.share(text);
+            }
+          }, icon: Icon(Icons.share))
         ],
       ),
       body: FutureBuilder(
@@ -117,3 +128,4 @@ class _createUpdateNoteState extends State<createUpdateNote> {
     );
   }
 }
+
