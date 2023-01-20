@@ -1,9 +1,9 @@
 import 'package:first_app/notes/create_update_note_view.dart';
-import 'package:first_app/notes/create_update_note_view.dart';
 import 'package:first_app/notes/notesview.dart';
 import 'package:first_app/pages/loginpage.dart';
 import 'package:first_app/pages/registrationsuccessful.dart';
 import 'package:first_app/pages/sign_uppage.dart';
+import 'package:first_app/pages/understanding_bloc.dart';
 import 'package:first_app/pages/verifyemail.dart';
 import 'package:first_app/utilities/MyTheme.dart';
 import 'package:first_app/utilities/routes.dart';
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         theme: MyTheme.lightTheme(context),
         darkTheme: MyTheme.darkTheme(context),
-        initialRoute: MyRoutes.homeRoute,
+        initialRoute: '/BlocDemo/',
         routes: {
           MyRoutes.NotesviewRoute: (context) => NotesView(),
           MyRoutes.loginRoute: (context) => LoginPage(),
@@ -30,8 +30,9 @@ class MyApp extends StatelessWidget {
           MyRoutes.verifyemailRoute: (context) => verifyemail(),
           MyRoutes.homeRoute: (context) => home(),
           MyRoutes.createUpdateNote: (context) => createUpdateNote(),
-           MyRoutes.regsuccess: (context) => regsuccessfull()
+           MyRoutes.regsuccess: (context) => regsuccessfull(),
           // "/regsuccessfull/":(context) => const regsuccessfull()
+          "/BlocDemo/":(context) => const BlocDemo()
         }
     );
   }
