@@ -2,12 +2,15 @@ import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/services/auth/bloc/auth_bloc.dart';
 import 'package:first_app/services/auth/bloc/auth_event.dart';
+import 'package:first_app/utilities/dialog/generic_dialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer' show log;
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
+
+import '../services/auth/bloc/auth_state.dart';
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class LoginPage extends StatefulWidget{
   @override
@@ -153,42 +156,34 @@ class _LoginPageState extends State<LoginPage> {
                       Material(
                         borderRadius: BorderRadius.circular(12),
                         child: ButtonTheme(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_Formkey.currentState!.validate()) {
-                                final email = _email.text;
-                                final password = _password.text;
-                                try {
+                            child: BlocListener<AuthBloc, AuthState>(
+                              listener: (context, state) async{
+                                if(state is AuthStateLoggedOut){
+                                  if(state.exception is UserNotFoundAuthException){
+                                    await showAlertDialog(context, 'User not found');
+                                  }
+                                  else if(state.exception is WrongPasswordAuthException){
+                                    await showAlertDialog(context, 'Wrong Credentials');
+                                  }
+                                  else if(state.exception is GenericAuthException){
+                                    await showAlertDialog(context, 'Authentication Error');
+                                  }
+                                }
+                              },
+                              child: ElevatedButton(
+                              onPressed: () async {
+                                if (_Formkey.currentState!.validate()) {
+                                  final email = _email.text;
+                                  final password = _password.text;
                                   context.read<AuthBloc>().add(
                                       AuthEventLogIn(
                                           email: email,
                                           password: password)
                                   );
-                                  // WidgetsBinding.instance.addPostFrameCallback((_) {
-                                  //   Navigator.pushNamed(
-                                  //       context, MyRoutes
-                                  //       .homeRoute); //pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
-                                  // });
                                 }
-                                on UserNotFoundAuthException {
-                                  log("User not found");
-                                  showAlertDialog(
-                                      context, "User not found");
-                                }
-                                on WrongPasswordAuthException {
-                                  log("Wrong password");
-                                  showAlertDialog(
-                                      context,
-                                      "Password is wrong. Please try again"
-                                  );
-                                }
-                                on GenericAuthException {
-                                  showAlertDialog(
-                                      context, "Authentication error");
-                                }
-                              }
-                            }, child: Text("Login"),
-                          ),
+                                  }, child: Text("Login"),
+                            ),
+),
                         ),
                       ),
                       SizedBox(
