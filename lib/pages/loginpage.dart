@@ -1,7 +1,10 @@
 import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
+import 'package:first_app/services/auth/bloc/auth_bloc.dart';
+import 'package:first_app/services/auth/bloc/auth_event.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:developer' show log;
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
@@ -153,45 +156,47 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (_Formkey.currentState!.validate()) {
+                                final email = _email.text;
+                                final password = _password.text;
                                 try {
-                                  final email = _email.text;
-                                  final password = _password.text;
-                                  final UserCredential = await AuthService.firebase().logIn(
-                                      email: email,
-                                      password: password);
-                                  log(UserCredential.toString());
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      Navigator.pushNamed(
-                                          context, MyRoutes
-                                          .homeRoute); //pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
-                                    });
+                                  context.read<AuthBloc>().add(
+                                      AuthEventLogIn(
+                                          email: email,
+                                          password: password)
+                                  );
+                                  // WidgetsBinding.instance.addPostFrameCallback((_) {
+                                  //   Navigator.pushNamed(
+                                  //       context, MyRoutes
+                                  //       .homeRoute); //pushNamedAndRemoveUntil pushes our screen and (route)=>false means that we have specified to remove all the screens present before this screen
+                                  // });
                                 }
-                                on UserNotFoundAuthException{
+                                on UserNotFoundAuthException {
                                   log("User not found");
                                   showAlertDialog(
                                       context, "User not found");
                                 }
-                                on WrongPasswordAuthException{
+                                on WrongPasswordAuthException {
                                   log("Wrong password");
                                   showAlertDialog(
-                                      context, "Password is wrong. Please try again"
+                                      context,
+                                      "Password is wrong. Please try again"
                                   );
                                 }
-                                on GenericAuthException{
+                                on GenericAuthException {
                                   showAlertDialog(
                                       context, "Authentication error");
                                 }
                               }
-                              }, child: Text("Login"),
+                            }, child: Text("Login"),
                           ),
-                          ),
-                          ),
+                        ),
+                      ),
                       SizedBox(
                         height: 15,
                       ),
-                      Text("OR",style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18
+                      Text("OR", style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
                       ),),
                       //
                       SizedBox(
@@ -200,20 +205,21 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Create new account,",style: TextStyle(
-                            fontStyle: FontStyle.italic,
+                          Text("Create new account,", style: TextStyle(
+                              fontStyle: FontStyle.italic,
                               fontSize: 15
                           ),),
                           InkWell(
                             onTap: () {
-                                Navigator.pushNamed(context, MyRoutes.signupRoute);
+                              Navigator.pushNamed(
+                                  context, MyRoutes.signupRoute);
                             },
                             child: Text("Sign up", style: TextStyle(
-                             color: Colors.deepPurple,
+                                color: Colors.deepPurple,
                                 decoration: TextDecoration.underline,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15
-                              ),),
+                            ),),
                           ),
                         ],
                       ),
@@ -223,9 +229,9 @@ class _LoginPageState extends State<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Forgotten Password? ",style: TextStyle(
-                            fontStyle: FontStyle.italic,
-                            fontSize: 15
+                          Text("Forgotten Password? ", style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              fontSize: 15
                           ),),
                           InkWell(
                             onTap: () {
@@ -249,7 +255,7 @@ class _LoginPageState extends State<LoginPage> {
           );
         default:
           return const Text("Loading...");
-      };
+      }
     }
       )
     )

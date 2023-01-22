@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:first_app/notes/notes_list.dart';
 import 'package:first_app/services/auth/auth_service.dart';
+import 'package:first_app/services/auth/bloc/auth_bloc.dart';
+import 'package:first_app/services/auth/bloc/auth_event.dart';
 import 'package:first_app/services/cloud/firebase_cloud_storage.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/cloud/cloud_note.dart';
 import '../utilities/MyTheme.dart';
 import '../widgets/drawer.dart';
@@ -20,7 +23,6 @@ class NotesView extends StatefulWidget{
 
 class _NotesViewState extends State<NotesView> {
   late final FirebaseCloudStorage _notesService;
-  bool _boo=true;
   String get userId =>
       AuthService
           .firebase()
@@ -51,9 +53,8 @@ class _NotesViewState extends State<NotesView> {
                         context); //The dialog is returned from logoutdialog(context)
                     log(want_tologout.toString());
                     if (want_tologout) {
-                      await FirebaseAuth.instance.signOut();
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, MyRoutes.loginRoute, (route) => false);
+                        context.read<AuthBloc>().add(
+                          const AuthEventLogOut());
                     }
                     break;
                 }

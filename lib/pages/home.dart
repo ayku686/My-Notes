@@ -1,47 +1,36 @@
-import 'package:first_app/services/auth/auth_service.dart';
+import 'package:first_app/notes/notesview.dart';
+import 'package:first_app/pages/loginpage.dart';
+import 'package:first_app/pages/verifyemail.dart';
+import 'package:first_app/services/auth/bloc/auth_event.dart';
+import 'package:first_app/services/auth/bloc/auth_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../firebase_options.dart';
-import '../utilities/routes.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../services/auth/bloc/auth_bloc.dart';
 
 class home  extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.read<AuthBloc>().add(const AuthEventInitialize());
     return Material(
-        child: FutureBuilder(
-            future: AuthService.firebase().Initialize(),
-            //Here we have FutureBuilder which takes the credentials and checks or registers it with the firebase. Now there can be two cases one is that the registration is complete and second is it didn't. In second case it returns the default case
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.done:
-                  final user = AuthService.firebase().currentUser;
-                  if(user!=null) {
-                    if (user.isEmailVerified) {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pushNamed(context, MyRoutes.NotesviewRoute);
-                      });
-                      //return NotesView();//In this the response was slow
-                    }
-                    else {
-                      // return verifyemail();
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        Navigator.pushNamed(context, MyRoutes.verifyemailRoute);
-                      });
-                    }
-                  }
-                  else {
-                    WidgetsBinding.instance.addPostFrameCallback((_){
-                      Navigator.pushNamed(context, MyRoutes.loginRoute,);
-                    });
-                  }
-                  return const Text("Done");
-                default:
-                  return CircularProgressIndicator(
-                    color: Colors.deepPurple,
-                  );
-              }
+        child: BlocBuilder<AuthBloc ,AuthState>(
+          builder: (context,state) {
+            if (state is AuthStateLoggedIn) {
+              return const NotesView();
             }
+            else if (state is AuthStateNeedsEmailVerification) {
+              return const verifyemail();
+            }
+            else if (state is AuthStateLoggedOut) {
+              return LoginPage();
+            }
+            else {
+              return const Scaffold(
+                body: CircularProgressIndicator(),
+              );
+            }
+          }
         )
 
     );
