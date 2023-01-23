@@ -69,7 +69,7 @@ class FirebaseAuthProvider implements AuthProvider{
   Future<void> sendVerificationEmail() async{
     final user=FirebaseAuth.instance.currentUser;
     if(user!=null) {
-      await user?.sendEmailVerification();
+      await user.sendEmailVerification();
     }
     else{
       throw UserNotLoggedInAuthException();

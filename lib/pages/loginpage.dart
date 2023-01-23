@@ -2,12 +2,11 @@ import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/services/auth/bloc/auth_bloc.dart';
 import 'package:first_app/services/auth/bloc/auth_event.dart';
-import 'package:first_app/utilities/dialog/generic_dialog.dart';
+import 'package:first_app/utilities/dialog/loading_dialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:developer' show log;
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
 
 import '../services/auth/bloc/auth_state.dart';
@@ -19,7 +18,6 @@ class LoginPage extends StatefulWidget{
 }
 
 class _LoginPageState extends State<LoginPage> {
-  @override
   String name="";
   final _Formkey=GlobalKey<FormState>();
   //A late keyword tells the compiler that though this field doesn't contain a value now it will surely have one in the future
@@ -29,6 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   //Remember to dispose of the TextEditingController when it is no longer needed. This will ensure we discard any resources used by the object.
   //These all things we are doing for authentication purpose
   //We are creating a link between our TextFormField and our login button so that when we firebase does authentication it gets the value of email and password which the user has entered
+  CloseDialog? _closeDialogHandle;
   @override
   void initState(){
     _email=TextEditingController();
@@ -42,134 +41,144 @@ class _LoginPageState extends State<LoginPage> {
     _password.dispose();
     super.dispose();
   }
-
-  bool changeButton = false;
+  @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Material(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        if(state is AuthStateLoggedOut){
+          final closeDialog = _closeDialogHandle;
+          if(!state.isLoading && closeDialog != null){
+            closeDialog();
+            _closeDialogHandle = null;
+          }
+          else if(state.isLoading && closeDialog == null){
+            _closeDialogHandle = showLoadingDialog(
+                context: context,
+                text: 'Loading');
+          }
+          if(state.exception is UserNotFoundAuthException){
+            await showAlertDialog(context, 'User not found');
+          }
+          else if(state.exception is WrongPasswordAuthException){
+            await showAlertDialog(context, 'Wrong Credentials');
+          }
+          else if(state.exception is GenericAuthException){
+            await showAlertDialog(context, 'Authentication Error');
+          }
+        }
+      },
+      child: Material(
 
       color: Colors.white,
       child: SingleChildScrollView(
        child:FutureBuilder(
         future: AuthService.firebase().Initialize(),
-    builder:(context,snapshot) {
-      switch (snapshot.connectionState) {
-        case ConnectionState.done:
-          return Form(
-            key: _Formkey, //
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 80,
-                ),
+      builder:(context,snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.done:
+            return Form(
+              key: _Formkey, //
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 80,
+                  ),
 
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 40, vertical: 0),
-                  child: Image.asset("allimages/login.png",
-                      fit: BoxFit.fitHeight),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 0),
+                    child: Image.asset("allimages/login.png",
+                        fit: BoxFit.fitHeight),
+                  ),
 
-                Text("Welcome $name", style: GoogleFonts.nerkoOne(
-                    color: Colors.deepPurple,
-                    fontSize: 35,
-                    letterSpacing: 1
-                  // fontWeight: FontWeight.bold,
+                  Text("Welcome $name", style: GoogleFonts.nerkoOne(
+                      color: Colors.deepPurple,
+                      fontSize: 35,
+                      letterSpacing: 1
+                    // fontWeight: FontWeight.bold,
 
-                ),
-                ),
-                Padding(
-                  //to add padding just select the column and press ALT+ENTER
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 50, vertical: 20),
-                  child: Column(
-                    children: [
-                      Card(
-                        child: TextFormField(
-                          controller: _email,
-                          enableSuggestions: true,
-                          keyboardType: TextInputType.emailAddress,
-                          autocorrect: false,
-                          decoration:
-                          InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 4),
-                              labelText: "Email",
-                              hintText: "Enter your email address"
+                  ),
+                  ),
+                  Padding(
+                    //to add padding just select the column and press ALT+ENTER
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 20),
+                    child: Column(
+                      children: [
+                        Card(
+                          child: TextFormField(
+                            controller: _email,
+                            enableSuggestions: true,
+                            keyboardType: TextInputType.emailAddress,
+                            autocorrect: false,
+                            decoration:
+                            const InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 4),
+                                labelText: "Email",
+                                hintText: "Enter your email address"
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Email cannot be empty";
+                              }
+                              else {
+                                return null;
+                              }
+                            },
+                            //We have used this onChanged function to attach the username after the welcome text when the user types his name
+                            // onChanged: (value){
+                            //   name=value;
+                            //   setState(() {});
+                            // },
                           ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return "Email cannot be empty";
-                            }
-                            else
-                              return null;
-                          },
-                          //We have used this onChanged function to attach the username after the welcome text when the user types his name
-                          // onChanged: (value){
-                          //   name=value;
-                          //   setState(() {});
-                          // },
                         ),
-                      ),
-                      SizedBox(
-                          height: 10
-                      ),
-                      Card(
-                        borderOnForeground: true,
-                        color: Colors.white,
-                        child: TextFormField(
-                          obscureText: true,
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          controller: _password,
+                        const SizedBox(
+                            height: 10
+                        ),
+                        Card(
+                          borderOnForeground: true,
+                          color: Colors.white,
+                          child: TextFormField(
+                            obscureText: true,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            controller: _password,
 
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(horizontal: 4),
-                            labelText: "Password",
-                            hintText: "Enter your password ",
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(horizontal: 4),
+                              labelText: "Password",
+                              hintText: "Enter your password ",
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return "Password cannot be empty";
+                              } else if (value.length < 8) {
+                                return "Password must contain at least 8 characters";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
-                          validator: (value) {
-                            if (value!.isEmpty)
-                              return "Password cannot be empty";
-                            else if (value.length < 8)
-                              return "Password must contain at least 8 characters";
-                            else
-                              return null;
-                          },
                         ),
-                      ),
-                      // Padding(
-                      //   padding: const EdgeInsets.all(30.0),
-                      //   child: ElevatedButton(
-                      //     child: Text("Login"),
-                      //     onPressed: () {
-                      //       //We use this Navigator.pushNamed to switch the screen on button click
-                      //       Navigator.pushNamed(context, MyRoutes.homeRoute);
-                      //     },
-                      //     style: TextButton.styleFrom(fixedSize: Size(80, 40))),
-                      //     ),
-                      //To give ripple effect what we do is we wrap InkWell inside the Material widget,remove the decoration of the AnimatedContainer and give the color inside the Material widget only
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Material(
-                        borderRadius: BorderRadius.circular(12),
-                        child: ButtonTheme(
-                            child: BlocListener<AuthBloc, AuthState>(
-                              listener: (context, state) async{
-                                if(state is AuthStateLoggedOut){
-                                  if(state.exception is UserNotFoundAuthException){
-                                    await showAlertDialog(context, 'User not found');
-                                  }
-                                  else if(state.exception is WrongPasswordAuthException){
-                                    await showAlertDialog(context, 'Wrong Credentials');
-                                  }
-                                  else if(state.exception is GenericAuthException){
-                                    await showAlertDialog(context, 'Authentication Error');
-                                  }
-                                }
-                              },
+                        // Padding(
+                        //   padding: const EdgeInsets.all(30.0),
+                        //   child: ElevatedButton(
+                        //     child: Text("Login"),
+                        //     onPressed: () {
+                        //       //We use this Navigator.pushNamed to switch the screen on button click
+                        //       Navigator.pushNamed(context, MyRoutes.homeRoute);
+                        //     },
+                        //     style: TextButton.styleFrom(fixedSize: Size(80, 40))),
+                        //     ),
+                        //To give ripple effect what we do is we wrap InkWell inside the Material widget,remove the decoration of the AnimatedContainer and give the color inside the Material widget only
+                        const SizedBox(
+                          height: 30,
+                        ),
+                        Material(
+                          borderRadius: BorderRadius.circular(12),
+                          child: ButtonTheme(
                               child: ElevatedButton(
                               onPressed: () async {
                                 if (_Formkey.currentState!.validate()) {
@@ -181,35 +190,35 @@ class _LoginPageState extends State<LoginPage> {
                                           password: password)
                                   );
                                 }
-                                  }, child: Text("Login"),
-                            ),
-),
+                                  }, child: const Text("Login"),
+                              ),
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
-                      Text("OR", style: TextStyle(
+                      const Text("OR", style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18
                       ),),
                       //
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Create new account,", style: TextStyle(
+                          const Text("Create new account,", style: TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: 15
                           ),),
                           InkWell(
                             onTap: () {
-                              Navigator.pushNamed(
-                                  context, MyRoutes.signupRoute);
+                              context.read<AuthBloc>().add(
+                                AuthEventShouldRegister()
+                              );
                             },
-                            child: Text("Sign up", style: TextStyle(
+                            child: const Text("Sign up", style: TextStyle(
                                 color: Colors.deepPurple,
                                 decoration: TextDecoration.underline,
                                 fontWeight: FontWeight.bold,
@@ -218,13 +227,13 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 01,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("Forgotten Password? ", style: TextStyle(
+                          const Text("Forgotten Password? ", style: TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: 15
                           ),),
@@ -232,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                             onTap: () {
                               Navigator.pushNamed(context, MyRoutes.homeRoute);
                             },
-                            child: Text("Click here", style: TextStyle(
+                            child: const Text("Click here", style: TextStyle(
                                 color: Colors.deepPurple,
                                 decoration: TextDecoration.underline,
                                 fontWeight: FontWeight.bold,
@@ -254,6 +263,7 @@ class _LoginPageState extends State<LoginPage> {
     }
       )
     )
-    );
+    ),
+);
   }
 }

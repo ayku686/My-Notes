@@ -1,8 +1,8 @@
-import 'package:first_app/pages/home.dart';
 import 'package:first_app/services/auth/auth_service.dart';
-import 'package:first_app/utilities/routes.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:first_app/services/auth/bloc/auth_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../services/auth/bloc/auth_bloc.dart';
 class verifyemail extends StatefulWidget{
   const verifyemail({Key? key}) : super(key: key);
 
@@ -12,17 +12,11 @@ class verifyemail extends StatefulWidget{
 final user=AuthService.firebase().currentUser;
 class _verifyemailState extends State<verifyemail> {
   @override
-  // void initState() {
-  //   Navigator.pushNamedAndRemoveUntil(
-  //       context, MyRoutes.homeRoute, (route) => false);
-  //   super.initState();
-  // }
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar:AppBar(
         backgroundColor: Colors.deepPurple,
-        title: Text("Verify your email address",style: TextStyle(
+        title: const Text("Verify your email address",style: TextStyle(
           color: Colors.white
         ),
         ), 
@@ -31,29 +25,25 @@ class _verifyemailState extends State<verifyemail> {
         padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 8),
         child: Column(
           children: [
-          Text("Kindly verify your email address"),
             TextButton(
-                onPressed: () async {
-                  AuthService.firebase().sendVerificationEmail();
-                  Future.delayed(Duration(seconds: 10));
-                  if (await EmailVerified()) {
-                    home();
-                  }
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                    const AuthEventSendEmailVerification(),
+                  );
                 },
-                child: Text("Send email verification")
+                child: const Text("Send email verification")
               ),
+            TextButton(
+                onPressed: () {
+              context.read<AuthBloc>().add(
+               const AuthEventLogOut()
+              );
+            },
+                child: const Text("Restart"))
         ]
         ),
       )
     );
   }
 }
-Future<bool> EmailVerified() async{
-  var yes=await user!.isEmailVerified;
-  if(yes){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
+

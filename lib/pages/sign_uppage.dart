@@ -1,20 +1,20 @@
-import 'dart:developer' show log;
 import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
+import 'package:first_app/services/auth/bloc/auth_event.dart';
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
-import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../services/auth/bloc/auth_bloc.dart';
+import '../services/auth/bloc/auth_state.dart';
 
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class signUpPage extends StatefulWidget{
   @override
 
-  State<signUpPage> createState() => _signUpPageState();
+  State<signUpPage> createState() =>_signUpPageState();
 }
 
 class _signUpPageState extends State<signUpPage> {
-  @override
   String name="";
   final _Formkey=GlobalKey<FormState>();
   late final TextEditingController _email;
@@ -37,9 +37,33 @@ class _signUpPageState extends State<signUpPage> {
     super.dispose();
   }
 
-   Widget build(BuildContext context) {
+   @override
+  Widget build(BuildContext context) {
     // TODO: implement build
-    return Material(
+    return BlocListener<AuthBloc, AuthState>(
+    listener: (context, state) async {
+      if(state is AuthStateRegistering){
+         if(state.exception is EmailAlreadyInUseAuthException ){
+          await showAlertDialog(
+                  context, 'Email already exists.\n Please try with a different email');
+        }
+         else if(state is WeakPasswordAuthException){
+           await showAlertDialog(
+               context, "Password is weak"
+           );
+         }
+         else if(state is InvalidEmailAuthException){
+            await showAlertDialog(
+               context, "Invalid email"
+           );
+         }
+         else if(state is GenericAuthException){
+           await showAlertDialog(
+               context, 'Failed to register.\n Please try again');
+         }
+      }
+    },
+    child: Material(
 
         color: Colors.white,
         child: SingleChildScrollView(
@@ -52,10 +76,10 @@ class _signUpPageState extends State<signUpPage> {
               return Form(
                 key: _Formkey, //
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
                   child: Column(
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 120,
                       ),
 
@@ -65,7 +89,7 @@ class _signUpPageState extends State<signUpPage> {
                       //       fit: BoxFit.fitHeight ),
                       // ),
 
-                      Text("Let's get started...", style: TextStyle(
+                      const Text("Let's get started...", style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.deepPurple,
                         fontSize: 26,
@@ -83,7 +107,7 @@ class _signUpPageState extends State<signUpPage> {
                                 keyboardType: TextInputType.name,
                                 autocorrect: false,
                                 decoration:
-                                InputDecoration(
+                                const InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(
                                         horizontal: 4),
                                     labelText: "Name",
@@ -93,8 +117,9 @@ class _signUpPageState extends State<signUpPage> {
                                   if (value!.isEmpty) {
                                     return "Name cannot be empty";
                                   }
-                                  else
+                                  else {
                                     return null;
+                                  }
                                 },
                               ),
                             ),
@@ -105,7 +130,7 @@ class _signUpPageState extends State<signUpPage> {
                                 controller: _email,
                                 autocorrect: true,
                                 decoration:
-                                InputDecoration(
+                                const InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(
                                         horizontal: 4),
                                     labelText: "Email Id",
@@ -115,8 +140,9 @@ class _signUpPageState extends State<signUpPage> {
                                   if (value!.isEmpty) {
                                     return "Email cannot be empty";
                                   }
-                                  else
+                                  else {
                                     return null;
+                                  }
                                 },
                               ),
                             ),
@@ -126,7 +152,7 @@ class _signUpPageState extends State<signUpPage> {
                                 keyboardType: TextInputType.number,
                                 autocorrect: false,
                                 decoration:
-                                InputDecoration(
+                                const InputDecoration(
                                     contentPadding: EdgeInsets.symmetric(
                                         horizontal: 4),
                                     labelText: "Phone no.",
@@ -136,12 +162,13 @@ class _signUpPageState extends State<signUpPage> {
                                   if (value!.isEmpty) {
                                     return "Phone no. cannot be empty";
                                   }
-                                  else
+                                  else {
                                     return null;
+                                  }
                                 },
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                                 height: 10
                             ),
                             Card(
@@ -152,23 +179,24 @@ class _signUpPageState extends State<signUpPage> {
                                 enableSuggestions: false,
                                 autocorrect: false,
                                 controller: _password,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 4),
                                   labelText: "Password",
                                   hintText: "Enter your password ",
                                 ),
                                 validator: (value) {
-                                  if (value!.isEmpty)
-                                    return "Password cannnot be empty";
-                                  else if (value.length < 8)
+                                  if (value!.isEmpty) {
+                                    return "Password cannot be empty";
+                                  } else if (value.length < 8) {
                                     return "Password must contain at least 8 characters";
-                                  else
+                                  } else {
                                     return null;
+                                  }
                                 },
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                                 height: 10
                             ),
                             Card(
@@ -178,17 +206,18 @@ class _signUpPageState extends State<signUpPage> {
                                 enableSuggestions: false,
                                 autocorrect: false,
                                 controller: _confirmpassword,
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 4),
                                   labelText: "Confirm password",
                                   hintText: "Enter your password ",
                                 ),
                                 validator: (value) {
-                                  if (value != _password.text)
+                                  if (value != _password.text) {
                                     return "Password doesn't match";
-                                  else
+                                  } else {
                                     return null;
+                                  }
                                 },
                               ),
                             ),
@@ -201,63 +230,39 @@ class _signUpPageState extends State<signUpPage> {
                                 child:ButtonTheme(
                                   height: 30,
                                   child: ElevatedButton(
-                                      onPressed: () async {
+                                      onPressed: () {
                                       if (_Formkey.currentState!.validate()) {
-                                        try {
                                           final email = _email.text;
                                           final password = _password.text;
-                                          final UserCredential =
-                                          await AuthService.firebase().signUp(email: email, password: password);
-                                          log(UserCredential.toString());
-                                          if(UserCredential!=null){
-                                            Navigator.pushNamedAndRemoveUntil(context, MyRoutes.regsuccess,(route)=>false);
-                                          }
-                                        }
-                                        on WeakPasswordAuthException{
-                                          log("Weak password");
-                                          showAlertDialog(
-                                              context, "Password is weak"
+                                          context.read<AuthBloc>().add(
+                                           AuthEventRegister(
+                                               email,
+                                               password)
                                           );
-                                        }
-                                        on InvalidEmailAuthException{
-                                          log("Invalid email");
-                                          showAlertDialog(
-                                              context, "Invalid email"
-                                          );
-                                        }
-                                        on EmailAlreadyInUseAuthException{
-                                          log("Email already in use");
-                                          showAlertDialog(
-                                              context, "Email already in use. Please try with a different email"
-                                          );
-                                        }
-                                        on GenericAuthException{
-                                          showAlertDialog(
-                                              context, "Invalid Credentials");
-                                        }
+                                          showAlertDialog(context, "Congratulations! Your account has been successfully created.");
                                       }
-                                    }, child: Text("Register"),
+                                    }, child: const Text("Register"),
                                   ),
                                 ),
                               ),
                             ),
-                            Text("Already have an account?"),
+                            const Text("Already have an account?"),
                             InkWell(
                               onTap: () {
-                                Navigator.pushNamed(
-                                    context, MyRoutes.loginRoute);
+                               context.read<AuthBloc>().add(const AuthEventLogOut()
+                               );
                               },
-                              child: Text("Sign in", style: TextStyle(
+                              child: const Text("Sign in", style: TextStyle(
                                   color: Colors.deepPurple,
                                   decoration: TextDecoration.underline,
                                   fontWeight: FontWeight.bold
 
                               ),),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 15,
                             ),
-                            Text("OR", style: TextStyle(
+                            const Text("OR", style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16
                             ),),
@@ -271,10 +276,11 @@ class _signUpPageState extends State<signUpPage> {
               );
                 default :
                   return const Text("Loading...");
-            };
+            }
             }
             ),
         ),
-    );
+    ),
+);
   }
 }
