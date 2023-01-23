@@ -1,6 +1,7 @@
 import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/services/auth/bloc/auth_event.dart';
+import 'package:first_app/utilities/dialog/generic_dialog.dart';
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -239,8 +240,13 @@ class _signUpPageState extends State<signUpPage> {
                                                email,
                                                password)
                                           );
-                                          showAlertDialog(context, "Congratulations! Your account has been successfully created.");
-                                      }
+                                          showGenericDialog(context: context,
+                                                            title: "Registration Successful",
+                                                            content:"Congratulations! Your account has been successfully created.\n Kindly verify your email",
+                                                            optionsBuilder: () => {
+                                                                       'OK':null
+                                                      });
+                                          }
                                     }, child: const Text("Register"),
                                   ),
                                 ),

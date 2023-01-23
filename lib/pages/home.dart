@@ -22,8 +22,7 @@ class home  extends StatelessWidget {
               return const NotesView();
             }
             else if (state is AuthStateNeedsEmailVerification) {
-              showAlertDialog(context, "Congratulations! \nYour account has been successfully created.\nKindly verify your email");
-              return const verifyemail();
+              return verifyemail();
             }
             else if(state is AuthStateRegistering){
               return signUpPage();

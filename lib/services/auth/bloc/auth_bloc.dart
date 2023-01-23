@@ -1,7 +1,10 @@
 import 'package:first_app/services/auth/auth_provider.dart';
 import 'package:first_app/services/auth/bloc/auth_event.dart';
 import 'package:first_app/services/auth/bloc/auth_state.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../utilities/dialog/showAlertDialog.dart';
 //This is our AuthBloc which takes AuthState as input and gives AuthEvent as output
 //This AuthBloc is responsible for handling everything related to authentication(i.e., initializing the log in process, then log in and then logout
 class AuthBloc extends Bloc<AuthEvent,AuthState>{
@@ -79,8 +82,12 @@ class AuthBloc extends Bloc<AuthEvent,AuthState>{
           email: email,
           password: password
         );
-        await provider.sendVerificationEmail();
-        emit(const AuthStateNeedsEmailVerification());
+            Widget? build(BuildContext context) {
+              showAlertDialog(context,
+                  "Congratulations! \nYour account has been successfully created.\nKindly verify your email");
+            }
+          await provider.sendVerificationEmail();
+          emit(const AuthStateNeedsEmailVerification());
       }on Exception catch(e){
         emit(AuthStateRegistering(exception: e));
       }
