@@ -10,10 +10,14 @@ class AuthEventInitialize extends AuthEvent{
 class AuthEventRegister extends AuthEvent{
   final String email;
   final String password;
-  AuthEventRegister(this.email, this.password);
+  const AuthEventRegister(this.email, this.password);
 }
 class AuthEventShouldRegister extends AuthEvent{
-  AuthEventShouldRegister();
+  const AuthEventShouldRegister();
+}
+class AuthEventForgottenPassword extends AuthEvent{
+  final String? email;
+  const AuthEventForgottenPassword({this.email});
 }
 class AuthEventLogIn extends AuthEvent{
   final String email;

@@ -2,18 +2,15 @@ import 'package:first_app/services/auth/auth_exceptions.dart';
 import 'package:first_app/services/auth/auth_service.dart';
 import 'package:first_app/services/auth/bloc/auth_bloc.dart';
 import 'package:first_app/services/auth/bloc/auth_event.dart';
-import 'package:first_app/utilities/dialog/loading_dialog.dart';
 import 'package:first_app/utilities/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:first_app/utilities/dialog/showAlertDialog.dart';
-
 import '../services/auth/bloc/auth_state.dart';
 //to make a Stateful widget select the class name and press ALT+ENTER and select Convert to Stateful Widget
 class LoginPage extends StatefulWidget{
   @override
-
   State<LoginPage> createState() => _LoginPageState();
 }
 
@@ -27,7 +24,6 @@ class _LoginPageState extends State<LoginPage> {
   //Remember to dispose of the TextEditingController when it is no longer needed. This will ensure we discard any resources used by the object.
   //These all things we are doing for authentication purpose
   //We are creating a link between our TextFormField and our login button so that when we firebase does authentication it gets the value of email and password which the user has entered
-  CloseDialog? _closeDialogHandle;
   @override
   void initState(){
     _email=TextEditingController();
@@ -46,16 +42,6 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) async {
         if(state is AuthStateLoggedOut){
-          final closeDialog = _closeDialogHandle;
-          if(!state.isLoading && closeDialog != null){
-            closeDialog();
-            _closeDialogHandle = null;
-          }
-          else if(state.isLoading && closeDialog == null){
-            _closeDialogHandle = showLoadingDialog(
-                context: context,
-                text: 'Loading');
-          }
           if(state.exception is UserNotFoundAuthException){
             await showAlertDialog(context, 'User not found');
           }
@@ -215,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                           InkWell(
                             onTap: () {
                               context.read<AuthBloc>().add(
-                                AuthEventShouldRegister()
+                                const AuthEventShouldRegister()
                               );
                             },
                             child: const Text("Sign up", style: TextStyle(
